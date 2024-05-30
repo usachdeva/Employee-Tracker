@@ -1,0 +1,18 @@
+{
+    "name": "employee-tracker",
+    "version": "1.0.0",
+    "description": "Bootcamp 2024 challenge 12 employee tracker",
+    "main": "connection.js",
+    "start": "node server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.19.2",
+        "inquirer": "^8.2.6",
+        "pg": "^8.11.5"
+    }
+}
