@@ -1,1 +1,1 @@
-
+delete from department where name = 'hr';

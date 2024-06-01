@@ -3,14 +3,19 @@
     "version": "1.0.0",
     "description": "Bootcamp 2024 challenge 12 employee tracker",
     "main": "connection.js",
-    "start": "node server.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js",
+        "watch": "nodemon server.js"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "devDependencies": {
+        "nodemon": "^2.0.4"
+    },
     "dependencies": {
+        "colors": "^1.4.0",
         "express": "^4.19.2",
         "inquirer": "^8.2.6",
         "pg": "^8.11.5"
