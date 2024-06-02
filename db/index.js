@@ -62,7 +62,7 @@ class DB {
     // employee by manager
     employeeManager(manager_id) {
         `SELECT e.id, e.first_name, e.last_name, r.title, d.name as department_name, r.salary, CONCAT(m.first_name, ' ', m.last_name) as manager from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
-        employee m ON e.manager_id = m.id WHERE e.id = ($1);`,
+        employee m ON e.manager_id = m.id WHERE e.manager_id = ($1);`,
             [manager_id];
     }
 
@@ -82,18 +82,20 @@ class DB {
     }
 
     // delete department
-    deleteDepartment(id) {
-        return this.query(`delete from department where id = ($1);`, [id]);
+    deleteDepartment(name) {
+        return this.query(`delete from department where name = ($1);`, [name]);
     }
 
     // delete a role
-    deleteRole(id) {
-        return this.query(`delete from role where id = ($1);`, [id]);
+    deleteRole(title) {
+        return this.query(`delete from role where title = ($1);`, [title]);
     }
 
     // delete an employee
-    deleteEmployee(id) {
-        return this.query(`delete from employee where id = ($1);`, [id]);
+    deleteEmployee(first_name) {
+        return this.query(`delete from employee where first_name = ($1);`, [
+            first_name,
+        ]);
     }
 }
 

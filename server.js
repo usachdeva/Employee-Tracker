@@ -162,14 +162,27 @@ function removeEmployee() {
     inquirer
         .prompt([
             {
-                type: "number",
-                name: "id",
+                type: "list",
+                name: "name",
                 message: "Which employee you would like to remove?",
+                choices: [
+                    { name: "Clark", value: "Clark" },
+                    { name: "Kara", value: "Kara" },
+                    { name: "Diana", value: "Diana" },
+                    { name: "Shayera", value: "Shayera" },
+                    { name: "Barry", value: "Barry" },
+                    { name: "Wally", value: "Wally" },
+                    { name: "Bruce", value: "Bruce" },
+                    { name: "Damian", value: "Damian" },
+                ],
             },
         ])
         .then((response) => {
-            let employee = response.id;
+            let employee = response.name;
             return db.deleteEmployee(employee);
+        })
+        .then(() => {
+            viewEmployees();
         })
         .then(() => loadQuestions());
 }
@@ -179,14 +192,27 @@ function removeRole() {
     inquirer
         .prompt([
             {
-                type: "number",
-                name: "id",
+                type: "list",
+                name: "title",
                 message: "Which role you would like to remove?",
+                choices: [
+                    { name: "Sales Lead", value: "Sales Lead" },
+                    { name: "Salesperson", value: "Salesperson" },
+                    { name: "Lead Engineer", value: "Lead Engineer" },
+                    { name: "Software Engineer", value: "Software Engineer" },
+                    { name: "Account Manager", value: "Account Manager" },
+                    { name: "Accountant", value: "Sales Lead" },
+                    { name: "Legal Team Lead", value: "Legal Team Lead" },
+                    { name: "Lawyer", value: "Lawyer" },
+                ],
             },
         ])
         .then((response) => {
-            let role = response.id;
+            let role = response.title;
             return db.deleteRole(role);
+        })
+        .then(() => {
+            viewRoles();
         })
         .then(() => loadQuestions());
 }
@@ -196,14 +222,39 @@ function removeDepartment() {
     inquirer
         .prompt([
             {
-                type: "number",
-                name: "id",
+                type: "list",
+                name: "name",
                 message: "Which department you would like to remove?",
+                choices: [
+                    {
+                        name: "Sales",
+                        value: "Sales",
+                    },
+                    {
+                        name: "Engineering",
+                        value: "Engineering",
+                    },
+                    {
+                        name: "Finance",
+                        value: "Finance",
+                    },
+                    {
+                        name: "Legal",
+                        value: "Legal",
+                    },
+                ],
             },
         ])
         .then((response) => {
-            let department = response.id;
-            return db.deleteDepartment(department);
+            let name = response.name;
+            return db.deleteDepartment(name);
+        })
+        .then(() => {
+            db.findAllDepartments().then(({ rows }) => {
+                let departments = rows;
+                console.log("\n");
+                console.table(departments);
+            });
         })
         .then(() => loadQuestions());
 }
@@ -288,6 +339,13 @@ function addEmployee() {
             let role_id = response.role_id;
             let manager_id = response.manager_id;
             return db.addAnEmployee(first_name, last_name, role_id, manager_id);
+        })
+        .then(() => {
+            db.findAllEmployees().then(({ rows }) => {
+                let employees = rows;
+                console.log("\n");
+                console.table(employees);
+            });
         })
         .then(() => loadQuestions())
         .catch((err) => console.error(err));
@@ -457,8 +515,8 @@ function viewEmployeesByManager() {
             },
         ])
         .then((response) => {
-            let manager_id = response.manager;
-            return db.employeeManager(manager_id);
+            let manager = response.manager;
+            return db.employeeManager(manager);
         })
         .then(({ rows }) => {
             let employees = rows;
