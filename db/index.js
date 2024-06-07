@@ -97,6 +97,21 @@ class DB {
             first_name,
         ]);
     }
+
+    // roles available now
+    rolesAvailable() {
+        return this.query(`select title from role;`);
+    }
+
+    // employees avaialble now
+    employeeAvailable() {
+        return this.query(`select first_name from employee;`);
+    }
+
+    // departments available now
+    departmentAvailable() {
+        return this.query(`select name from department;`);
+    }
 }
 
 module.exports = DB;

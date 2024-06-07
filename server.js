@@ -1,7 +1,6 @@
 const inquirer = require("inquirer");
 const { default: Choices } = require("inquirer/lib/objects/choices");
 const DB = require("./db");
-const { response } = require("express");
 const colors = require("colors");
 
 // it will load when the program starts
@@ -90,11 +89,11 @@ function loadQuestions() {
             // calling the approprite function
             switch (choice) {
                 case "VIEW_EMPLOYEES":
-                    viewEmployees();
+                    viewEmployees(); //working
                     break;
 
                 case "VIEW_EMPLOYEES_BY_DEPARTMENT":
-                    viewEmployeesByDepartment();
+                    viewEmployeesByDepartment(); //working
                     break;
 
                 case "VIEW_EMPLOYEES_BY_MANAGER":
@@ -106,7 +105,7 @@ function loadQuestions() {
                     break;
 
                 case "REMOVE_EMPLOYEE":
-                    removeEmployee();
+                    removeEmployee(); //working
                     break;
 
                 // case "UPDATE_EMPLOYEE_ROLE":
@@ -118,35 +117,35 @@ function loadQuestions() {
                 //     break;
 
                 case "VIEW_ROLES":
-                    viewRoles();
+                    viewRoles(); //working
                     break;
 
                 case "ADD_ROLE":
-                    addRole();
+                    addRole(); //working
                     break;
 
                 case "REMOVE_ROLE":
-                    removeRole();
+                    removeRole(); //working
                     break;
 
                 case "VIEW_DEPARTMENTS":
-                    viewDepartments();
+                    viewDepartments(); //working
                     break;
 
                 case "ADD_DEPARTMENT":
-                    addDepartment();
+                    addDepartment(); //working
                     break;
 
                 case "REMOVE_department":
-                    removeDepartment();
+                    removeDepartment(); //working
                     break;
 
                 case "VIEW_UTILIZED_BUDGET_BY_DEPARTMENT":
-                    viewUtilizedByDepartment();
+                    viewUtilizedByDepartment(); //working
                     break;
 
                 case "QUIT":
-                    quit();
+                    quit(); //working
                     break;
             }
         })
@@ -159,104 +158,90 @@ function loadQuestions() {
 
 // delete employee
 function removeEmployee() {
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "name",
-                message: "Which employee you would like to remove?",
-                choices: [
-                    { name: "Clark", value: "Clark" },
-                    { name: "Kara", value: "Kara" },
-                    { name: "Diana", value: "Diana" },
-                    { name: "Shayera", value: "Shayera" },
-                    { name: "Barry", value: "Barry" },
-                    { name: "Wally", value: "Wally" },
-                    { name: "Bruce", value: "Bruce" },
-                    { name: "Damian", value: "Damian" },
-                ],
-            },
-        ])
-        .then((response) => {
-            let employee = response.name;
-            return db.deleteEmployee(employee);
+    db.employeeAvailable()
+        .then(({ rows }) => {
+            let employees = rows.map((row) => row.first_name);
+            return employees;
         })
-        .then(() => {
-            viewEmployees();
-        })
-        .then(() => loadQuestions());
+        .then((choices) => {
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "name",
+                        message: "Which employee you would like to remove?",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    let employee = response.name;
+                    return db.deleteEmployee(employee);
+                })
+                .then(() => {
+                    viewEmployees();
+                })
+                .then(() => loadQuestions());
+        });
 }
 
 // remove role
 function removeRole() {
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "title",
-                message: "Which role you would like to remove?",
-                choices: [
-                    { name: "Sales Lead", value: "Sales Lead" },
-                    { name: "Salesperson", value: "Salesperson" },
-                    { name: "Lead Engineer", value: "Lead Engineer" },
-                    { name: "Software Engineer", value: "Software Engineer" },
-                    { name: "Account Manager", value: "Account Manager" },
-                    { name: "Accountant", value: "Sales Lead" },
-                    { name: "Legal Team Lead", value: "Legal Team Lead" },
-                    { name: "Lawyer", value: "Lawyer" },
-                ],
-            },
-        ])
-        .then((response) => {
-            let role = response.title;
-            return db.deleteRole(role);
+    db.rolesAvailable()
+        .then(({ rows }) => {
+            let roles = rows.map((row) => row.title);
+            return roles;
         })
-        .then(() => {
-            viewRoles();
-        })
-        .then(() => loadQuestions());
+        .then((choices) => {
+            return inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "title",
+                        message: "Which role you would like to remove?",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    let role = response.title;
+                    return db.deleteRole(role);
+                })
+                .then(() => {
+                    viewRoles();
+                })
+                .then(() => loadQuestions());
+        });
 }
 
 // remove department
 function removeDepartment() {
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "name",
-                message: "Which department you would like to remove?",
-                choices: [
-                    {
-                        name: "Sales",
-                        value: "Sales",
-                    },
-                    {
-                        name: "Engineering",
-                        value: "Engineering",
-                    },
-                    {
-                        name: "Finance",
-                        value: "Finance",
-                    },
-                    {
-                        name: "Legal",
-                        value: "Legal",
-                    },
-                ],
-            },
-        ])
-        .then((response) => {
-            let name = response.name;
-            return db.deleteDepartment(name);
+    db.departmentAvailable()
+        .then(({ rows }) => {
+            let roles = rows.map((row) => row.name);
+            return roles;
         })
-        .then(() => {
-            db.findAllDepartments().then(({ rows }) => {
-                let departments = rows;
-                console.log("\n");
-                console.table(departments);
-            });
-        })
-        .then(() => loadQuestions());
+        .then((choices) => {
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "name",
+                        message: "Which department you would like to remove?",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    let name = response.name;
+                    return db.deleteDepartment(name);
+                })
+                .then(() => {
+                    db.findAllDepartments().then(({ rows }) => {
+                        let departments = rows;
+                        console.log("\n");
+                        console.table(departments);
+                    });
+                })
+                .then(() => loadQuestions());
+        });
 }
 
 // budget by each department
@@ -357,6 +342,7 @@ function viewEmployees() {
         .then(({ rows }) => {
             let employees = rows;
             console.log("\n");
+            console.log(typeof employees);
             console.table(employees);
         })
         .then(() => loadQuestions());
@@ -364,42 +350,32 @@ function viewEmployees() {
 
 // view employees by department
 function viewEmployeesByDepartment() {
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "department",
-                message: "Which department employees you would like?",
-                choices: [
-                    {
-                        name: "Sales",
-                        value: "Sales",
-                    },
-                    {
-                        name: "Engineering",
-                        value: "Engineering",
-                    },
-                    {
-                        name: "Finance",
-                        value: "Finance",
-                    },
-                    {
-                        name: "Legal",
-                        value: "Legal",
-                    },
-                ],
-            },
-        ])
-        .then((response) => {
-            let department = response.department;
-            return db.viewEmployeesByDepartment(department);
-        })
+    db.departmentAvailable()
         .then(({ rows }) => {
-            let employees = rows;
-            console.log("\n");
-            console.table(employees);
+            let roles = rows.map((row) => row.name);
+            return roles;
         })
-        .then(() => loadQuestions());
+        .then((choices) => {
+            inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "department",
+                        message: "Which department employees you would like?",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    let department = response.department;
+                    return db.viewEmployeesByDepartment(department);
+                })
+                .then(({ rows }) => {
+                    let employees = rows;
+                    console.log("\n");
+                    console.table(employees);
+                })
+                .then(() => loadQuestions());
+        });
 }
 
 // view all departments
@@ -437,52 +413,50 @@ function addDepartment() {
         .then((response) => {
             db.addInDepartment(response.department);
         })
+        .then(() => viewDepartments())
         .then(() => loadQuestions());
 }
 
 // add a role
 function addRole() {
-    inquirer
-        .prompt([
-            {
-                type: "input",
-                name: "title",
-                message: "Enter the name of the role",
-            },
-            {
-                type: "number",
-                name: "salary",
-                message: "Enter the salary of the role",
-            },
-            {
-                type: "list",
-                name: "department",
-                message: "What is the department for the role",
-                choices: [
-                    {
-                        name: "Sales",
-                        value: 1,
-                    },
-                    {
-                        name: "Engineering",
-                        value: 2,
-                    },
-                    {
-                        name: "Finance",
-                        value: 3,
-                    },
-                    {
-                        name: "Legal",
-                        value: 4,
-                    },
-                ],
-            },
-        ])
-        .then((response) => {
-            db.addInRole(response.title, response.salary, response.department);
+    db.findAllDepartments()
+        .then(({ rows }) => {
+            return rows.map((row) => ({
+                name: row.name,
+                value: row.id,
+            }));
         })
-        .then(() => loadQuestions())
-        .catch((err) => console.error(`Error found : ${err}`));
+        .then((choices) => {
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        name: "title",
+                        message: "Enter the name of the role",
+                    },
+                    {
+                        type: "number",
+                        name: "salary",
+                        message: "Enter the salary of the role",
+                    },
+                    {
+                        type: "list",
+                        name: "department",
+                        message: "What is the department for the role",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    db.addInRole(
+                        response.title,
+                        response.salary,
+                        response.department
+                    );
+                })
+                .then(() => viewRoles())
+                .then(() => loadQuestions())
+                .catch((err) => console.error(`Error found : ${err}`));
+        });
 }
 
 // employee by  manager
