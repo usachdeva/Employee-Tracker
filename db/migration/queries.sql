@@ -10,4 +10,4 @@
 
 -- select * from employee;
 
-UPDATE Update employee SET manager_id = ($1) where first_name = ($2);
+select title from role;

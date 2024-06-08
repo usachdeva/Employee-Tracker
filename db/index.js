@@ -89,8 +89,8 @@ class DB {
     }
 
     // delete a role
-    deleteRole(title) {
-        return this.query(`delete from role where title = ($1);`, [title]);
+    deleteRole(id) {
+        return this.query(`delete from role where id = ($1);`, [id]);
     }
 
     // delete an employee
@@ -102,7 +102,7 @@ class DB {
 
     // roles available now
     rolesAvailable() {
-        return this.query(`select title from role;`);
+        return this.query(`select * from role;`);
     }
 
     // employees avaialble now
@@ -127,6 +127,14 @@ class DB {
         return this.query(
             `UPDATE employee SET manager_id = ($1) where first_name = ($2);`,
             [manager_id, first_name]
+        );
+    }
+
+    // update employee role
+    updateEmployeeRole(role_id, first_name) {
+        return this.query(
+            `UPDATE employee SET role_id = ($1) where first_name = ($2);`,
+            [role_id, first_name]
         );
     }
 }
