@@ -97,7 +97,7 @@ function loadQuestions() {
                     break;
 
                 case "VIEW_EMPLOYEES_BY_MANAGER":
-                    viewEmployeesByManager();
+                    viewEmployeesByManager(); //working
                     break;
 
                 case "ADD_EMPLOYEE":
@@ -460,45 +460,40 @@ function addRole() {
 }
 
 // employee by  manager
-// not working
 function viewEmployeesByManager() {
-    inquirer
-        .prompt([
-            {
-                type: "list",
-                name: "manager",
-                message: "Which manager you would like?",
-                choices: [
-                    {
-                        name: "Clark Kent - Legal",
-                        value: 1,
-                    },
-                    {
-                        name: "Shayera Hol - Engineer",
-                        value: 4,
-                    },
-                    {
-                        name: "Barry Allen - Sales",
-                        value: 5,
-                    },
-                    {
-                        name: "Bruce Wayne - Account",
-                        value: 7,
-                    },
-                ],
-            },
-        ])
-        .then((response) => {
-            let manager = response.manager;
-            return db.employeeManager(manager);
-        })
+    db.managerAvailable()
         .then(({ rows }) => {
-            let employees = rows;
-            console.log("\n");
-            console.table(employees);
+            const managers = rows.map((row) => ({
+                name: row.name,
+                value: row.id,
+            }));
+            console.log(managers);
+            return managers;
         })
-        .then(() => loadQuestions())
-        .catch((err) => console.error(err));
+        .then((choices) => {
+            return inquirer
+                .prompt([
+                    {
+                        type: "list",
+                        name: "manager",
+                        message:
+                            "Which manager would you like to view employees for?",
+                        choices: choices,
+                    },
+                ])
+                .then((response) => {
+                    let managerId = response.manager;
+                    console.log(managerId);
+                    return db.employeeManager(managerId);
+                })
+                .then(({ rows }) => {
+                    let employees = rows;
+                    console.log("\n");
+                    console.table(employees);
+                })
+                .then(() => loadQuestions())
+                .catch((err) => console.error(err));
+        });
 }
 
 init();

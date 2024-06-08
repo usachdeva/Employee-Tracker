@@ -61,9 +61,11 @@ class DB {
 
     // employee by manager
     employeeManager(manager_id) {
-        `SELECT e.id, e.first_name, e.last_name, r.title, d.name as department_name, r.salary, CONCAT(m.first_name, ' ', m.last_name) as manager from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
+        return this.query(
+            `SELECT e.id, e.first_name, e.last_name, r.title, d.name as department_name, e.manager_id, r.salary, CONCAT(m.first_name, ' ', m.last_name) as manager from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
         employee m ON e.manager_id = m.id WHERE e.manager_id = ($1);`,
-            [manager_id];
+            [manager_id]
+        );
     }
 
     // add an employee
@@ -111,6 +113,13 @@ class DB {
     // departments available now
     departmentAvailable() {
         return this.query(`select name from department;`);
+    }
+
+    // managers available now
+    managerAvailable() {
+        return this
+            .query(`SELECT e.id, CONCAT(e.first_name,' ', e.last_name) as name, r.title from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
+        employee m ON e.manager_id = m.id WHERE e.manager_id IS NULL;`);
     }
 }
 
