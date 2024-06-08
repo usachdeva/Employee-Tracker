@@ -112,9 +112,9 @@ function loadQuestions() {
                 //     updateEmployeeRole();
                 //     break;
 
-                // case "UPDATE_EMPLOYEE_MANAGER":
-                //     updateEmployeeManager();
-                //     break;
+                case "UPDATE_EMPLOYEE_MANAGER":
+                    updateEmployeeManager();
+                    break;
 
                 case "VIEW_ROLES":
                     viewRoles(); //working
@@ -155,6 +155,126 @@ function loadQuestions() {
 }
 
 // functions to call each query
+
+// update employee manager
+// choices 1 = available employees
+// choices 2 = available manager
+// function updateEmployeeManager() {
+//     let choices1;
+//     let choices2;
+//     let manager_id;
+//     let first_name;
+
+//     db.employeeAvailable()
+//         .then(({ rows }) => {
+//             choices1 = rows.map((row) => row.first_name);
+//             console.log(choices1);
+//             return choices1;
+//         })
+//         .then((choices1) => {
+//             inquirer.prompt([
+//                 {
+//                     type: "list",
+//                     name: "employee",
+//                     message: "Please select employee name",
+//                     choice: choices1,
+//                 },
+//             ]);
+//         })
+//         .then((response) => {
+//             first_name = response;
+//             return first_name;
+//         })
+//         .then(() => {
+//             db.managerAvailable()
+//                 .then(({ rows }) => {
+//                     choices2 = rows.map((row) => ({
+//                         name: row.name,
+//                         value: row.id,
+//                     }));
+//                     return choices2;
+//                 })
+//                 .then((choices2) => {
+//                     inquirer
+//                         .prompt([
+//                             {
+//                                 type: "list",
+//                                 name: "manager",
+//                                 message: "Please select manager name",
+//                                 choice: choices2,
+//                             },
+//                         ])
+//                         .then((response) => {
+//                             manager_id = response.value;
+//                             return manager_id;
+//                         })
+//                         .then(() => {
+//                             return db.updateManager(manager_id, first_name);
+//                         })
+//                         .then(() => {
+//                             return db.findAllEmployees;
+//                         })
+//                         .then(({ rows }) => {
+//                             let employees = rows;
+//                             console.log("\n");
+//                             console.table(employees);
+//                         })
+//                         .then(() => loadQuestions())
+//                         .catch((err) => console.error(err));
+//                 });
+//         });
+// }
+
+async function updateEmployeeManager() {
+    try {
+        // Fetch available employees
+        let { rows: employeeRows } = await db.employeeAvailable();
+        let choices1 = employeeRows.map((row) => row.first_name);
+        console.log(choices1);
+
+        // Prompt user to select an employee
+        let { employee: selectedEmployee } = await inquirer.prompt([
+            {
+                type: "list",
+                name: "employee",
+                message: "Please select employee name",
+                choices: choices1,
+            },
+        ]);
+
+        // Fetch available managers
+        let { rows: managerRows } = await db.managerAvailable();
+        let choices2 = managerRows.map((row) => ({
+            name: row.name,
+            value: row.id,
+        }));
+
+        console.log(choices2);
+
+        // Prompt user to select a manager
+        let { manager: selectedManagerId } = await inquirer.prompt([
+            {
+                type: "list",
+                name: "manager",
+                message: "Please select manager name",
+                choices: choices2,
+            },
+        ]);
+
+        // Update the selected employee's manager
+        await db.updateManager(selectedManagerId, selectedEmployee);
+
+        // Fetch and display all employees
+        let { rows: allEmployees } = await db.findAllEmployees();
+        console.log("\n");
+        console.table(allEmployees);
+
+        // Reload questions
+        loadQuestions();
+    } catch (err) {
+        console.error(err);
+    }
+}
 
 // delete employee
 function removeEmployee() {

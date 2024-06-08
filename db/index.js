@@ -32,7 +32,7 @@ class DB {
     findAllEmployees() {
         return this
             .query(`SELECT e.id, e.first_name, e.last_name, r.title, d.name as department_name, r.salary, CONCAT(m.first_name, ' ', m.last_name) as manager from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
-        employee m ON e.manager_id = m.id;`);
+        employee m ON e.manager_id = m.id ORDER BY e.id asc;`);
     }
 
     //add a department
@@ -120,6 +120,14 @@ class DB {
         return this
             .query(`SELECT e.id, CONCAT(e.first_name,' ', e.last_name) as name, r.title from employee e join role r on e.role_id = r.id join department d on r.department_id = d.id LEFT JOIN 
         employee m ON e.manager_id = m.id WHERE e.manager_id IS NULL;`);
+    }
+
+    // Update employee manager
+    updateManager(manager_id, first_name) {
+        return this.query(
+            `UPDATE employee SET manager_id = ($1) where first_name = ($2);`,
+            [manager_id, first_name]
+        );
     }
 }
 
